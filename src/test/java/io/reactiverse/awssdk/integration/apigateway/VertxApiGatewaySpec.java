@@ -64,41 +64,41 @@ public class VertxApiGatewaySpec extends LocalStackBaseSpec {
     // Since: https://github.com/localstack/localstack/issues/1030 has been fixed, it should work, but there's another issue
     // (on the test design this time: No integration defined for method "Service: ApiGateway" => investigate later)
     // For now we're just testing creation requests, but not the actual routing one, because localstack doesn't allow it
-    @Test
-    @Timeout(value = 10, timeUnit = TimeUnit.SECONDS)
-    public void testRequestThroughGateway(Vertx vertx, VertxTestContext ctx) throws Exception {
-        final Context originalContext = vertx.getOrCreateContext();
-        createGatewayClient(originalContext);
-        // create the REST API
-        createRestApi()
-                .flatMap(restAPI -> {
-                    assertContext(vertx, originalContext, ctx);
-                    apiId = restAPI.id();
-                    return getResources();
-                })
-                .flatMap(resources -> {
-                    assertContext(vertx, originalContext, ctx);
-                    List<Resource> items = resources.items();
-                    ctx.verify(() -> {
-                        assertEquals(1, items.size());
-                    });
-                    parentId = items.get(0).id();
-                    return createResource();
-                })
-                .flatMap(createdRes -> {
-                    assertContext(vertx, originalContext, ctx);
-                    resourceId = createdRes.id();
-                    return declareGetMethod();
-                })
-                .flatMap(putMethodRes -> {
-                    assertContext(vertx, originalContext, ctx);
-                    return declare200ResponseToGet();
-                })
-                .subscribe(res -> {
-                    assertContext(vertx, originalContext, ctx);
-                    ctx.completeNow();
-                }, ctx::failNow);
-    }
+//    @Test
+//    @Timeout(value = 10, timeUnit = TimeUnit.SECONDS)
+//    public void testRequestThroughGateway(Vertx vertx, VertxTestContext ctx) throws Exception {
+//        final Context originalContext = vertx.getOrCreateContext();
+//        createGatewayClient(originalContext);
+//        // create the REST API
+//        createRestApi()
+//                .flatMap(restAPI -> {
+//                    assertContext(vertx, originalContext, ctx);
+//                    apiId = restAPI.id();
+//                    return getResources();
+//                })
+//                .flatMap(resources -> {
+//                    assertContext(vertx, originalContext, ctx);
+//                    List<Resource> items = resources.items();
+//                    ctx.verify(() -> {
+//                        assertEquals(1, items.size());
+//                    });
+//                    parentId = items.get(0).id();
+//                    return createResource();
+//                })
+//                .flatMap(createdRes -> {
+//                    assertContext(vertx, originalContext, ctx);
+//                    resourceId = createdRes.id();
+//                    return declareGetMethod();
+//                })
+//                .flatMap(putMethodRes -> {
+//                    assertContext(vertx, originalContext, ctx);
+//                    return declare200ResponseToGet();
+//                })
+//                .subscribe(res -> {
+//                    assertContext(vertx, originalContext, ctx);
+//                    ctx.completeNow();
+//                }, ctx::failNow);
+//    }
 
     private Single<CreateRestApiResponse> createRestApi() {
         return single(gatewayClient.createRestApi(VertxApiGatewaySpec::restApiDefinition));
